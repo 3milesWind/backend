@@ -6,7 +6,7 @@ const DATABASE_NAME = "EZCampus";
 let db;
 
 async function connect() {
-    let connection = await MongoClientClient.connect(DATABASE_URL);
+    let connection = await MongoClient.connect(DATABASE_URL);
     db = connection.db(DATABASE_NAME);
 }
 
