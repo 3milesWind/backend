@@ -1,12 +1,17 @@
 const db = require("../utils/database");
 const router = require("express").Router();
 
-router.post("/email_register", async (req, res) => {
+router.use(require("body-parser").json());
+
+router.post("/email_register", async (req, res) => { 
+    
     let data;
     data = {
-        email: req.body.email,
-        password: req.body.password
+        email: req.body.user.email,
+        password: req.body.user.password
     };
+    
+    console.log(data);
 
     let user = db.findOne("EZCampus", { email: data.email }, { projection: { "_id": 0 } });
     if (!user) {
@@ -15,6 +20,7 @@ router.post("/email_register", async (req, res) => {
     } else {
         res.status(409).json({ message: "user existed" });
     }
+    
 });
 
 module.exports = router;
