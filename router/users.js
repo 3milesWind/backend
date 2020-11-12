@@ -17,4 +17,4 @@ router.post("/email_register", async (req, res) => {
     }
 });
 
-module.exports=router;
+module.exports = router;
