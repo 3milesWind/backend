@@ -18,9 +18,8 @@ router.post("/email_register", async (req, res) => {
         db.insertOne("EZCampus", data);
         res.status(200).json({ message: "User Created" });
     } else {
-        res.status(409).json({ message: "user existed" });
-    }
-    
+        res.status(409).json({ message: "User existed" });
+    }    
 });
 
 module.exports = router;
