@@ -10,7 +10,7 @@ async function connect() {
     db = connection.db(DATABASE_NAME);
 }
 
-// connect();
+ connect();
 
 module.exports = {
 
