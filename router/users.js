@@ -16,3 +16,5 @@ router.post("/email_register", async (req, res) => {
         res.status(409).json({ message: "user existed" });
     }
 });
+
+module.exports=router;
