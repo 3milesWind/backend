@@ -13,14 +13,17 @@ router.post("/email_register", async (req, res) => {
     
     console.log(data);
 
-    let user = db.findOne("EZCampus", { email: data.email }, { projection: { "_id": 0 } });
+    let user = await db.findOne("Users", { email: data.email }, { projection: { "_id": 0 } });
+    console.log(user);
     if (!user) {
-        db.insertOne("EZCampus", data);
+        db.insertOne("Users", data);
         res.status(200).json({ message: "User Created" });
     } else {
         res.status(409).json({ message: "user existed" });
     }
     
 });
+
+
 
 module.exports = router;
