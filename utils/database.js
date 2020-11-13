@@ -38,9 +38,9 @@ module.exports = {
         }
     },
 
-    updateOne: async function (collection, querySelector, updateData, updateOptions) {
+    updateOne: async function (collection, querySelector, updateData) {
         try {
-            return await db.collection(collection).updateOne(querySelector, queryOptions, updateOptions);
+            return await db.collection(collection).updateOne(querySelector, updateData);
         } catch (e) {
             throw Error(e);
         }

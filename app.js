@@ -13,4 +13,3 @@ app.get("/", (req, res) => {
 });
 
 app.use("/users", require("./router/users"));
-app.use('/posts', require('./router/posts'));
