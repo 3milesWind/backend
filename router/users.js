@@ -32,9 +32,9 @@ router.post("/email_login", async (req, res) => {
         email: req.body.user.email,
         password: req.body.user.password
     };
-    console.log(data);
+    console.log("data is: ", data);
     let user = await db.findOne("Users", { email: data.email }, { projection: { "_id": 0 } });
-    console.log(user);
+    console.log('user is: ', user);
 
     
     if (!user) {//user email not found in db
