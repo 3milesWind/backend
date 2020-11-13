@@ -49,9 +49,8 @@ router.post("/email_login", async (req, res) => {
     if (!user) {//user email not found in db
         res.status(404).json({ message: "User Does Not Exist", statusCode: 404 });
     } else {//user email found in db
-        if(req.body.password==user.password){//password match
-            res.send({userName: user.userName, email: user.email});
-            res.status(200);
+        if (req.body.password == user.password) {//password match
+            res.status(200).json({ "statusCode": 200, "user": { "userName": user.userName, "email": user.email } });
         } else {//password NOT match
             res.status(403).json({ message: "Wrong Password", statusCode: 403 });
         }
