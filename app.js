@@ -1,6 +1,6 @@
 const app = require("express")();
 
-let port = 1234;
+let port = 3000;
 
 app.listen(port, () => {
   console.log("listening at  http://localhost:" + port);
