@@ -24,6 +24,14 @@ router.post("/create_a_post", async (req, res) => {
 });
 
 
+/* Get All Posts */
+router.get("/get_all_posts", async (req, res) => { 
+    console.log("Get All Posts Function");
+    const allPosts = await db.find('Posts');
+    console.log("allPosts: ", allPosts);
+    res.send(allPosts);
+    res.status(200);
+});
 
 
 module.exports = router;
