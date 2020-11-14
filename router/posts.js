@@ -32,7 +32,7 @@ router.get("/get_all_posts", async (req, res) => {
 });
 
 /* Get a post detail */
-router.get("/get_a_post_detail/:postId", async ({ params: { postId }}, res) => {
+router.get("/get_a_post_detail", async ({ query: { postId }}, res) => {
     let thePost = await db.findOne("Posts", { postId: postId }, { projection: { "_id": 0 } });
     console.log("a post detail: ", thePost);
     if (!thePost) {
