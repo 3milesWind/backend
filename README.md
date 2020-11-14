@@ -1,6 +1,6 @@
 ### Installation
 
-Requires [Node.js](https://nodejs.org/) v4+ to run.
+Requires [Node.js](https://nodejs.org/) v4+  and [MongoDB](https://docs.mongodb.com/manual/installation/) to run.
 
 Install the dependencies and start the server.
 
