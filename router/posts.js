@@ -20,16 +20,15 @@ router.post("/create_a_post", async (req, res) => {
     console.log("passin create post data is: ", data);
 
     db.insertOne("Posts", data);
-    res.status(200).json({ successful: true, message: "Post Created", statusCode: 200 });
+    res.status(200).json({ statusCode: 200, successful: true, message: "Post Created" });
 });
 
 /* Get All Posts */
 router.get("/get_all_posts", async (req, res) => { 
     console.log("Get All Posts Function");
-    const allPosts = await db.find('Posts',);
+    const allPosts = await db.find('Posts', {}, {projection:{ _id: 0 }});
     console.log("allPosts: ", allPosts);
-    res.send(allPosts);
-    res.status(200);
+    res.status(200).json({"statusCode": 200, "data": allPosts});
 });
 
 /* Get a post detail */
