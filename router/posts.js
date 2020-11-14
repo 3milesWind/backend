@@ -26,15 +26,21 @@ router.post("/create_a_post", async (req, res) => {
 /* Get All Posts */
 router.get("/get_all_posts", async (req, res) => { 
     console.log("Get All Posts Function");
-    const allPosts = await db.find('Posts', {}, {projection:{ _id: 0 }});
+    let allPosts = await db.find('Posts', {}, {projection:{ _id: 0 }});
     console.log("allPosts: ", allPosts);
     res.status(200).json({"statusCode": 200, "data": allPosts});
 });
 
 /* Get a post detail */
-// router.get("/get_all_posts?postId", async (req, res) => {
-
-// });
+router.get("/get_a_post_detail/:postId", async ({ params: { postId }}, res) => {
+    let thePost = await db.findOne("Posts", { postId: postId }, { projection: { "_id": 0 } });
+    console.log("a post detail: ", thePost);
+    if (!thePost) {
+        res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
+    } else {
+        res.status(200).json({ statusCode: 200, data: thePost });
+    }
+});
 
 
 
