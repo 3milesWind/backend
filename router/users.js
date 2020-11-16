@@ -80,5 +80,66 @@ router.get("/resend_verify", async ({ query: { email } }, res) => {
     
 });
 
+router.get("/forget_password/send_email", async ({ query: { email } }, res) => {
+    let user = await db.findOne("Users", { email: email }, { projection: { "_id": 0 } });
+    if (!user) {
+        res.status(404).json({ statusCode: 404, message: "user does not exist" });
+    } else {
+        let random_code = Math.floor(100000 + Math.random() * 900000);
+
+        let password_reset = {
+            verify: false,
+            code: random_code,
+            expiration_date: Date.now() + 300000 // 5 minutes
+        }
+
+        await db.updateOne("Users", { email: email }, {$set: {password_reset: password_reset}});
+        em.sendEmail(email, "EZCampus Account Password Reset",
+            'Hello,\n\n' + 'Your verification code is ' + random_code +'. The code is valid for 5 minutes.\n');
+        res.status(200).json({ statusCode: 200, message: "success" });
+    }
+});
+
+router.get("/forget_password/verify", async ({ query: { email, code } }, res) => {
+    let user = await db.findOne("Users", { email: email }, { projection: { "_id": 0 } });
+    if (!user) {
+        console.log(email);
+        res.status(404).json({ statusCode: 404, message: "user does not exist" });
+    } else {
+        if (user.password_reset.code != code) {
+            res.status(403).json({ statusCode: 403, message: "verification code incorrect" });
+        } else {
+            if (Date.now() > user.password_reset.expiration_date) {
+                res.status(408).json({ statusCode: 408, message: "timeout" });
+            } else {
+                let new_password_reset = user.password_reset;
+                new_password_reset.verify = true;
+                await db.updateOne("Users", { email: email }, { $set: { password_reset: new_password_reset } });
+                res.status(200).json({ statusCode: 200, message: "success" });
+            }
+        }
+    }
+});
+
+router.post("/forget_password/reset_password", async (req, res) => {
+    let data;
+    data = {
+        email: req.body.email,
+        password: req.body.password
+    };
+    console.log(data);
+
+    let user = await db.findOne("Users", { email: data.email }, { projection: { "_id": 0 } });
+    if (!user) {
+        res.status(404).json({ statusCode: 404, message: "user does not exist" });
+    } else {
+        if (!user.password_reset.verify) {
+            res.status(403).json({ statusCode: 403, message: "not verified" });
+        } else {
+            await db.updateOne("Users", { email: data.email }, { $set: { password: data.password } });
+            res.status(200).json({ statusCode: 200, message: "success" });
+        }
+    }
+});
 
 module.exports = router;
