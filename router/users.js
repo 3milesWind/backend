@@ -85,7 +85,7 @@ router.get("/forget_password/send_email", async ({ query: { email } }, res) => {
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
-        let random_code = Math.floor(100000 + Math.random() * 900000);
+        let random_code = Math.floor(100000 + Math.random() * 900000); // generate random 6 digit code
 
         let password_reset = {
             verify: false,
