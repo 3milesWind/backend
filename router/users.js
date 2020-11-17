@@ -124,7 +124,7 @@ router.get("/forget_password/verify", async ({ query: { codeEmail, code } }, res
 router.post("/forget_password/reset_password", async (req, res) => {
     let data;
     data = {
-        email: req.body.email,
+        email: req.body.codeEmail,
         password: req.body.password
     };
     console.log(data);
