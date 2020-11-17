@@ -8,13 +8,13 @@ module.exports = {
             port: "465",
             secure: true,
             auth: {
-                user: "noreply@ezcampus.onexmail.com",
+                user: "do-not-reply@ezcampus.onexmail.com",
                 pass: "Lzk940505"
             }
         });
         
         let mailOptions = {
-            from: "noreply@ezcampus.onexmail.com",
+            from: "do-not-reply@ezcampus.onexmail.com",
             to: to,
             subject: subject,
             text: content

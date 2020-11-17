@@ -27,6 +27,7 @@ router.post("/create_a_post", async (req, res) => {
 router.get("/get_all_posts", async (req, res) => { 
     console.log("Get All Posts Function");
     let allPosts = await db.find('Posts', {}, {projection:{ _id: 0 }});
+    allPosts.reverse();
     console.log("allPosts: ", allPosts);
     res.status(200).json({"statusCode": 200, "data": allPosts});
 });
