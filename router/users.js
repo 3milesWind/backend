@@ -103,7 +103,6 @@ router.get("/forget_password/send_email", async ({ query: { email } }, res) => {
 router.get("/forget_password/verify", async ({ query: { codeEmail, code } }, res) => {
     let user = await db.findOne("Users", { email: codeEmail }, { projection: { "_id": 0 } });
     if (!user) {
-        console.log(email);
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
         if (user.password_reset.code != code) {
@@ -127,7 +126,6 @@ router.post("/forget_password/reset_password", async (req, res) => {
         email: req.body.codeEmail,
         password: req.body.password
     };
-    console.log(data);
 
     let user = await db.findOne("Users", { email: data.email }, { projection: { "_id": 0 } });
     if (!user) {
@@ -136,7 +134,9 @@ router.post("/forget_password/reset_password", async (req, res) => {
         if (!user.password_reset.verify) {
             res.status(403).json({ statusCode: 403, message: "not verified" });
         } else {
-            await db.updateOne("Users", { email: data.email }, { $set: { password: data.password } });
+            let new_password_reset = user.password_reset;
+            new_password_reset.verify = false;
+            await db.updateOne("Users", { email: data.email }, { $set: { password: data.password, password_reset: new_password_reset } });
             res.status(200).json({ statusCode: 200, message: "success" });
         }
     }
