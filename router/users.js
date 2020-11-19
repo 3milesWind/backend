@@ -136,6 +136,7 @@ router.post("/forget_password/reset_password", async (req, res) => {
         } else {
             let new_password_reset = user.password_reset;
             new_password_reset.verify = false;
+            new_password_reset.code = null;
             await db.updateOne("Users", { email: data.email }, { $set: { password: data.password, password_reset: new_password_reset } });
             res.status(200).json({ statusCode: 200, message: "success" });
         }
