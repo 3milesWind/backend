@@ -11,7 +11,7 @@ router.post("/email_register", async (req, res) => {
     
     let data;
     data = {
-        email: req.body.email,
+        email: req.body.email.toLowerCase(),
         userName: req.body.userName,
         password: req.body.password,
         verify: false,
@@ -38,7 +38,7 @@ router.post("/email_register", async (req, res) => {
 router.post("/email_login", async (req, res) => { 
     let data;
     data = {
-        email: req.body.email,
+        email: req.body.email.toLowerCase(),
         password: req.body.password
     };
     console.log("passin login data is: ", data);
@@ -68,7 +68,7 @@ router.get("/confirmation/:token", async ({ params: { token } }, res) => {
 });
 
 router.get("/resend_verify", async ({ query: { email } }, res) => {
-    let user = await db.findOne("Users", { email: email }, { projection: { "_id": 0 } });
+    let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "_id": 0 } });
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
@@ -81,7 +81,7 @@ router.get("/resend_verify", async ({ query: { email } }, res) => {
 });
 
 router.get("/forget_password/send_email", async ({ query: { email } }, res) => {
-    let user = await db.findOne("Users", { email: email }, { projection: { "_id": 0 } });
+    let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "_id": 0 } });
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
@@ -93,7 +93,7 @@ router.get("/forget_password/send_email", async ({ query: { email } }, res) => {
             expiration_date: Date.now() + 300000 // 5 minutes
         }
 
-        await db.updateOne("Users", { email: email }, {$set: {password_reset: password_reset}});
+        await db.updateOne("Users", { email: email.toLowerCase() }, {$set: {password_reset: password_reset}});
         em.sendEmail(email, "EZCampus Account Password Reset",
             'Hello,\n\n' + 'Your verification code is ' + random_code +'. The code is valid for 5 minutes.\n');
         res.status(200).json({ statusCode: 200, message: "success" });
@@ -101,7 +101,7 @@ router.get("/forget_password/send_email", async ({ query: { email } }, res) => {
 });
 
 router.get("/forget_password/verify", async ({ query: { codeEmail, code } }, res) => {
-    let user = await db.findOne("Users", { email: codeEmail }, { projection: { "_id": 0 } });
+    let user = await db.findOne("Users", { email: codeEmail.toLowerCase() }, { projection: { "_id": 0 } });
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
@@ -113,7 +113,7 @@ router.get("/forget_password/verify", async ({ query: { codeEmail, code } }, res
             } else {
                 let new_password_reset = user.password_reset;
                 new_password_reset.verify = true;
-                await db.updateOne("Users", { email: codeEmail }, { $set: { password_reset: new_password_reset } });
+                await db.updateOne("Users", { email: codeEmail.toLowerCase() }, { $set: { password_reset: new_password_reset } });
                 res.status(200).json({ statusCode: 200, message: "success" });
             }
         }
@@ -123,7 +123,7 @@ router.get("/forget_password/verify", async ({ query: { codeEmail, code } }, res
 router.post("/forget_password/reset_password", async (req, res) => {
     let data;
     data = {
-        email: req.body.codeEmail,
+        email: req.body.codeEmail.toLowerCase(),
         password: req.body.password
     };
 
