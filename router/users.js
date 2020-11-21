@@ -156,7 +156,7 @@ router.post("/profile/save", async (req, res) => {
     }
 });
 
-router.get("profile/get", async ({ query: { email } }, res) => {
+router.get("/profile/get", async ({ query: { email } }, res) => {
     let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "profile": 1 } });
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
