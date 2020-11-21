@@ -161,7 +161,8 @@ router.get("/profile/get", async ({ query: { email } }, res) => {
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else if (!user.profile) {
-        res.status(204).json({ statusCode: 204, message: "user profile is empty" });
+        console.log("profile empty");
+        res.status(500).json({ statusCode: 500, message: "user profile is empty" });
     } else {
         res.status(200).json({ statusCode: 200, profile: user.profile });
     }
