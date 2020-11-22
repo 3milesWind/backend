@@ -143,68 +143,55 @@ router.post("/forget_password/reset_password", async (req, res) => {
     }
 });
 
+// save or update existing user profile
+// login Email is REQUIRED
 router.post("/profile/save", async (req, res) => {
-    let data = req.body;
-    data.loginEmail = data.loginEmail.toLowerCase();
+    let data = {
+        "city": req.body.city,
+        "state": req.body.state,
+        "loginEmail": req.body.loginEmail.toLowerCase(), // required
+        "contactEmail": req.body.contactEmail,
+        "phone": req.body.phone,
+        "aboutMe": req.body.aboutMe,
+        "avatarlink": req.body.avatarlink
 
-    let user = await db.findOne("Users", {email: data.loginEmail}, { projection: { "_id": 0 } });
+    };
+    let userName = req.body.userName;
+
+    let user = await db.findOne("Users", {email: data.loginEmail}, { projection: { "profile": 1, "userName": 1 } });
+
     if(!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
-        await db.updateOne("Users", { email: data.loginEmail }, { $set: { profile: data } });
+        // update if provided
+        if (user.profile) {
+            data = user.profile;
+            userName = req.body.userName ? req.body.userName : data.userName;
+            data.city = req.body.city ? req.body.city : data.city;
+            data.state = req.body.state ? req.body.state : data.state;
+            data.phone = req.body.state ? req.body.phone : data.phone;
+            data.aboutMe = req.body.state ? req.body.aboutMe : data.aboutMe;
+            data.avatarlink = req.body.avatarlink ? req.body.avatarlink : data.avatarlink;
+        }
+        
+        data.contactEmail = req.body.contactEmail ? req.body.contactEmail.toLowerCase() : data.contactEmail;
+      
+        await db.updateOne("Users", { email: data.loginEmail }, { $set: { profile: data, userName: userName } });
+      
         res.status(200).json({statusCode: 200, message: "success" });
     }
 });
 
 router.get("/profile/get", async ({ query: { email } }, res) => {
-    let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "profile": 1 } });
+    let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "profile": 1, "userName": 1 } });
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else if (!user.profile) {
-        console.log("profile empty");
         res.status(500).json({ statusCode: 500, message: "user profile is empty" });
     } else {
+        user.profile.userName = user.userName;
         res.status(200).json({ statusCode: 200, profile: user.profile });
     }
 });
-
-/* add a contact*/
-router.post("/contact/add_a_contact", async (req, res) => {
-    let data = req.body;
-    data.myEmail = data.myEmail.toLowerCase();
-    data.userEmail = data.userEmail.toLowerCase();
-
-    let userMe = await db.findOne("Users", {email: data.myEmail}, { projection: { "_id": 0 } });
-    let user = await db.findOne("Users", {email: data.userEmail}, { projection: { "_id": 0 } });
-    if (!userMe){
-        res.status(404).json({ statusCode: 404, message: "current user does not exist" });
-    }
-    else if(!user) {
-        res.status(404).json({ statusCode: 404, message: "incoming user does not exist" });
-    } else {       
-        await db.updateOne("Users", { email: data.myEmail }, { $set: { contact: {username: data.username, userEmail: data.userEmail} } });
-        res.status(200).json({statusCode: 200, message: "success" });
-    }
-});
-
-/* delete a contact*/
-// router.delete("/contact/delete", async ({query: { email }}, res) => {
-   
-// });
-
-/* get a user's contact list */
-router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
-    let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "contact": 1 } });
-    if (!user) {
-        res.status(404).json({ statusCode: 404, message: "user does not exist" });
-    } else if (!user.contact) {
-        console.log("user's contactList empty");
-        res.status(500).json({ statusCode: 500, message: "user contact is empty" });
-    } else {
-        res.status(200).json({ statusCode: 200, contact: user.contact });
-    }    
-});
-
-
 
 module.exports = router;  
