@@ -159,6 +159,7 @@ router.post("/profile/save", async (req, res) => {
     let userName = req.body.userName;
 
     let user = await db.findOne("Users", {email: data.loginEmail}, { projection: { "profile": 1, "userName": 1 } });
+
     if(!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
@@ -174,8 +175,9 @@ router.post("/profile/save", async (req, res) => {
         }
         
         data.contactEmail = req.body.contactEmail ? req.body.contactEmail.toLowerCase() : data.contactEmail;
-        
+      
         await db.updateOne("Users", { email: data.loginEmail }, { $set: { profile: data, userName: userName } });
+      
         res.status(200).json({statusCode: 200, message: "success" });
     }
 });
