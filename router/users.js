@@ -147,47 +147,47 @@ router.post("/forget_password/reset_password", async (req, res) => {
 // login Email is REQUIRED
 router.post("/profile/save", async (req, res) => {
     let data = {
-        
-        "firstName": req.body.firstName,
-        "lastName": req.body.lastName,
         "city": req.body.city,
         "state": req.body.state,
         "loginEmail": req.body.loginEmail.toLowerCase(), // required
         "contactEmail": req.body.contactEmail,
         "phone": req.body.phone,
-        "aboutMe": req.body.aboutMe
+        "aboutMe": req.body.aboutMe,
+        "avatarlink": req.body.avatarlink
 
     };
+    let userName = req.body.userName;
 
-    let user = await db.findOne("Users", {email: data.loginEmail}, { projection: { "profile": 1 } });
+    let user = await db.findOne("Users", {email: data.loginEmail}, { projection: { "profile": 1, "userName": 1 } });
     if(!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
         // update if provided
         if (user.profile) {
             data = user.profile;
-            data.firstName = req.body.firstName ? req.body.firstName : data.firstName;
-            data.lastName = req.body.lastName ? req.body.lastName : data.lastName;
+            userName = req.body.userName ? req.body.userName : data.userName;
             data.city = req.body.city ? req.body.city : data.city;
             data.state = req.body.state ? req.body.state : data.state;
             data.phone = req.body.state ? req.body.phone : data.phone;
             data.aboutMe = req.body.state ? req.body.aboutMe : data.aboutMe;
+            data.avatarlink = req.body.avatarlink ? req.body.avatarlink : data.avatarlink;
         }
-
+        
         data.contactEmail = req.body.contactEmail ? req.body.contactEmail.toLowerCase() : data.contactEmail;
         
-        await db.updateOne("Users", { email: data.loginEmail }, { $set: { profile: data } });
+        await db.updateOne("Users", { email: data.loginEmail }, { $set: { profile: data, userName: userName } });
         res.status(200).json({statusCode: 200, message: "success" });
     }
 });
 
 router.get("/profile/get", async ({ query: { email } }, res) => {
-    let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "profile": 1 } });
+    let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "profile": 1, "userName": 1 } });
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else if (!user.profile) {
         res.status(500).json({ statusCode: 500, message: "user profile is empty" });
     } else {
+        user.profile.userName = user.userName;
         res.status(200).json({ statusCode: 200, profile: user.profile });
     }
 });
