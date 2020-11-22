@@ -181,8 +181,8 @@ router.post("/contact/add_a_contact", async (req, res) => {
     }
     else if(!user) {
         res.status(404).json({ statusCode: 404, message: "incoming user does not exist" });
-    } else {
-        await db.updateOne("Users", { email: data.myEmail }, { $set: { contact: data }, $unset: { contact: data.myEmail} });
+    } else {       
+        await db.updateOne("Users", { email: data.myEmail }, { $set: { contact: {username: data.username, userEmail: data.userEmail} } });
         res.status(200).json({statusCode: 200, message: "success" });
     }
 });
