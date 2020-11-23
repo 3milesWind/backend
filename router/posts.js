@@ -17,7 +17,7 @@ router.post("/create_a_post", async (req, res) => {
         creatorEmail: req.body.creatorEmail,
         postType: req.body.postType
     };
-    console.log("passin create post data is: ", data);
+    // console.log("passin create post data is: ", data);
 
     let user = await db.findOne("Users", { email: data.creatorEmail }, { projection: { "profile": 1 } });
     
@@ -33,17 +33,17 @@ router.post("/create_a_post", async (req, res) => {
 
 /* Get All Posts */
 router.get("/get_all_posts", async (req, res) => { 
-    console.log("Get All Posts Function");
+    // console.log("Get All Posts Function");
     let allPosts = await db.find('Posts', {}, {projection:{ _id: 0 }});
     allPosts.reverse();
-    console.log("allPosts: ", allPosts);
+    // console.log("allPosts: ", allPosts);
     res.status(200).json({"statusCode": 200, "data": allPosts});
 });
 
 /* Get a post detail */
 router.get("/get_a_post_detail", async ({ query: { postId }}, res) => {
     let thePost = await db.findOne("Posts", { postId: postId }, { projection: { "_id": 0 } });
-    console.log("a post detail: ", thePost);
+    // console.log("a post detail: ", thePost);
     if (!thePost) {
         res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
     } else {
@@ -51,6 +51,17 @@ router.get("/get_a_post_detail", async ({ query: { postId }}, res) => {
     }
 });
 
+/* delete a post */
+router.delete("/delete_a_post", async ({ query: { postId }}, res) => {
+    postId = postId.toLowerCase();
+    let thePost = await db.findOne("Posts", { "postId": postId }, { projection: { "_id": 0 } });
+    if (!thePost) {
+        res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
+    } else {
+    db.deleteOne("Posts", thePost);
+    res.status(200).json({statusCode: 200, message: "success"});
+    }
+});
 
 
 module.exports = router;
