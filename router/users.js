@@ -193,6 +193,7 @@ router.get("/profile/get", async ({ query: { email } }, res) => {
         res.status(200).json({ statusCode: 200, profile: user.profile });
     }
 });
+
 /* add a contact*/
 router.post("/contact/add_a_contact", async (req, res) => {
     let data = req.body;
@@ -213,11 +214,6 @@ router.post("/contact/add_a_contact", async (req, res) => {
     }
 });
 
-/* delete a contact*/
-// router.delete("/contact/delete", async ({query: { email }}, res) => {
-   
-// });
-
 /* get a user's contact list */
 router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
     let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "contact": 1 } });
@@ -230,5 +226,24 @@ router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
         res.status(200).json({ statusCode: 200, contact: user.contact });
     }    
 });
+
+
+/* delete a contact*/
+router.delete("/contact/delete", async ({query: { myEmail, userEmail }}, res) => {
+    myEmail = myEmail.toLowerCase();
+    userEmail = userEmail.toLowerCase();
+    let userMe = await db.findOne("Users", {email: myEmail}, { projection: { "_id": 0 } });
+    console.log("userMe is: ",userMe);
+    let user = await db.findOne("Users", {email: userEmail}, { projection: { "_id": 0 } });
+    if (!userMe){
+        res.status(404).json({ statusCode: 404, message: "current user does not exist" });
+    } else if (!user) {
+        res.status(404).json({ statusCode: 404, message: "incoming user does not exist" });
+    } else {
+        await db.updateOne("Users", {email: myEmail}, {$pull: {"contact": {"userEmail": userEmail}}});
+        res.status(200).json({statusCode: 200, message: "success", contact: userMe.contact});
+    }
+});
+
 
 module.exports = router;  
