@@ -241,7 +241,7 @@ router.delete("/contact/delete", async ({query: { myEmail, userEmail }}, res) =>
         res.status(404).json({ statusCode: 404, message: "incoming user does not exist" });
     } else {
         await db.updateOne("Users", {email: myEmail}, {$pull: {"contact": {"userEmail": userEmail}}});
-        res.status(200).json({statusCode: 200, message: "success", contact: userMe.contact});
+        res.status(200).json({statusCode: 200, message: "success"});
     }
 });
 
