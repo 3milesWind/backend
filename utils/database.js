@@ -46,6 +46,14 @@ module.exports = {
         }
     },
 
+    updateMany: async function (collection, querySelector, updateData) {
+        try {
+            return await db.collection(collection).updateMany(querySelector, updateData);
+        } catch (e) {
+            throw Error(e);
+        }
+    },
+
     insertOne: async function (collection, insertionData) {
         try {
             return await db.collection(collection).insertOne(insertionData);
