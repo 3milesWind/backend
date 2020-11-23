@@ -174,6 +174,13 @@ router.post("/profile/save", async (req, res) => {
             data.avatarlink = req.body.avatarlink ? req.body.avatarlink : data.avatarlink;
         }
         
+        if (req.body.avatarlink) {
+            data.avatarlink = req.body.avatarlink;
+            await db.updateMany("Posts", { creatorEmail: user.email }, { $set: { avatarlink: data.avatarlink } });
+        } else {
+            data.avatarlink = data.avatarlink;
+        }
+
         data.contactEmail = req.body.contactEmail ? req.body.contactEmail.toLowerCase() : data.contactEmail;
       
         await db.updateOne("Users", { email: data.loginEmail }, { $set: { profile: data, userName: userName } });
