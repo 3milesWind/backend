@@ -220,7 +220,6 @@ router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else if (!user.contact) {
-        console.log("user's contactList empty");
         res.status(500).json({ statusCode: 500, message: "user contact is empty" });
     } else {
         res.status(200).json({ statusCode: 200, contact: user.contact });
@@ -232,15 +231,14 @@ router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
 router.delete("/contact/delete", async ({query: { myEmail, userEmail }}, res) => {
     myEmail = myEmail.toLowerCase();
     userEmail = userEmail.toLowerCase();
-    let userMe = await db.findOne("Users", {email: myEmail}, { projection: { "_id": 0 } });
-    console.log("userMe is: ",userMe);
-    let user = await db.findOne("Users", {email: userEmail}, { projection: { "_id": 0 } });
+    let userMe = await db.findOne("Users", {"email": myEmail}, { projection: { "_id": 0 } });
+    let user = await db.findOne("Users", {"email": userEmail}, { projection: { "_id": 0 } });
     if (!userMe){
         res.status(404).json({ statusCode: 404, message: "current user does not exist" });
     } else if (!user) {
         res.status(404).json({ statusCode: 404, message: "incoming user does not exist" });
     } else {
-        await db.updateOne("Users", {email: myEmail}, {$pull: {"contact": {"userEmail": userEmail}}});
+        await db.updateOne("Users", {"email": myEmail}, {$pull: {"contact": {"userEmail": userEmail}}});
         res.status(200).json({statusCode: 200, message: "success"});
     }
 });
