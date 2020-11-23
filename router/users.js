@@ -198,6 +198,7 @@ router.post("/contact/add_a_contact", async (req, res) => {
     let data = req.body;
     data.myEmail = data.myEmail.toLowerCase();
     data.userEmail = data.userEmail.toLowerCase();
+    data.userAvatarLink = data.userAvatarLink.toLowerCase();
 
     let userMe = await db.findOne("Users", {email: data.myEmail}, { projection: { "_id": 0 } });
     let user = await db.findOne("Users", {email: data.userEmail}, { projection: { "_id": 0 } });
@@ -207,7 +208,7 @@ router.post("/contact/add_a_contact", async (req, res) => {
     else if(!user) {
         res.status(404).json({ statusCode: 404, message: "incoming user does not exist" });
     } else {       
-        await db.updateOne("Users", { email: data.myEmail }, { $push: {contact: {"username": data.username, "userEmail": data.userEmail}} });
+        await db.updateOne("Users", { email: data.myEmail }, { $push: {contact: {"username": data.username, "userEmail": data.userEmail, "userAvatarLink": data.userAvatarLink}} });
         res.status(200).json({statusCode: 200, message: "success" });
     }
 });
