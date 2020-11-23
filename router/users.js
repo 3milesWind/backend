@@ -18,10 +18,10 @@ router.post("/email_register", async (req, res) => {
         token: crypto.randomBytes(16).toString('hex')
     };
     
-    console.log("passin signup data is: ", data);
+    // console.log("passin signup data is: ", data);
 
     let user = await db.findOne("Users", { email: data.email }, { projection: { "_id": 0 } });
-    console.log('find signup user is: ', user);
+    // console.log('find signup user is: ', user);
 
     if (!user) {//user's email not signed up, now sign up with email+password
         db.insertOne("Users", data);
@@ -41,9 +41,9 @@ router.post("/email_login", async (req, res) => {
         email: req.body.email.toLowerCase(),
         password: req.body.password
     };
-    console.log("passin login data is: ", data);
+    // console.log("passin login data is: ", data);
     let user = await db.findOne("Users", { email: data.email }, { projection: { "_id": 0 } });
-    console.log('find login user is: ', user);
+    // console.log('find login user is: ', user);
 
     
     if (!user) {//user email not found in db
@@ -207,7 +207,7 @@ router.post("/contact/add_a_contact", async (req, res) => {
     else if(!user) {
         res.status(404).json({ statusCode: 404, message: "incoming user does not exist" });
     } else {       
-        await db.updateOne("Users", { email: data.myEmail }, { $set: { contact: {username: data.username, userEmail: data.userEmail} } });
+        await db.updateOne("Users", { email: data.myEmail }, { $push: {contact: {"username": data.username, "userEmail": data.userEmail}} });
         res.status(200).json({statusCode: 200, message: "success" });
     }
 });
