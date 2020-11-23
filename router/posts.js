@@ -47,8 +47,12 @@ router.get("/get_a_post_detail", async ({ query: { postId }}, res) => {
 router.delete("/delete_a_post", async ({ query: { postId }}, res) => {
     postId = postId.toLowerCase();
     let thePost = await db.findOne("Posts", { "postId": postId }, { projection: { "_id": 0 } });
+    if (!thePost) {
+        res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
+    } else {
     db.deleteOne("Posts", thePost);
     res.status(200).json({statusCode: 200, message: "success"});
+    }
 });
 
 
