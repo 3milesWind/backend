@@ -158,9 +158,9 @@ router.post("/profile/save", async (req, res) => {
     };
     let userName = req.body.userName;
 
-    let user = await db.findOne("Users", {email: data.loginEmail}, { projection: { "profile": 1, "userName": 1 } });
+    let user = await db.findOne("Users", { email: data.loginEmail }, { projection: { "profile": 1, "userName": 1 } });
 
-    if(!user) {
+    if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else {
         // update if provided
@@ -174,6 +174,13 @@ router.post("/profile/save", async (req, res) => {
             data.avatarlink = req.body.avatarlink ? req.body.avatarlink : data.avatarlink;
         }
         
+        if (req.body.userName) {
+            data.userName = req.body.userName;
+            await db.updateMany("Posts", { creatorEmail: user.email }, { $set: { creatorName: data.userName } });
+        } else {
+            data.userName = data.userName;
+        }
+
         if (req.body.avatarlink) {
             data.avatarlink = req.body.avatarlink;
             await db.updateMany("Posts", { creatorEmail: user.email }, { $set: { avatarlink: data.avatarlink } });
