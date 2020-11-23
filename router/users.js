@@ -176,14 +176,14 @@ router.post("/profile/save", async (req, res) => {
         
         if (req.body.userName) {
             data.userName = req.body.userName;
-            await db.updateMany("Posts", { creatorEmail: user.email }, { $set: { creatorName: data.userName } });
+            await db.updateMany("Posts", { creatorEmail: data.loginEmail }, { $set: { creatorName: data.userName } });
         } else {
             data.userName = data.userName;
         }
 
         if (req.body.avatarlink) {
             data.avatarlink = req.body.avatarlink;
-            await db.updateMany("Posts", { creatorEmail: user.email }, { $set: { avatarlink: data.avatarlink } });
+            await db.updateMany("Posts", { creatorEmail: data.loginEmail }, { $set: { avatarlink: data.avatarlink } });
         } else {
             data.avatarlink = data.avatarlink;
         }
