@@ -244,8 +244,9 @@ router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
         console.log("user's contactList empty");
         res.status(500).json({ statusCode: 500, message: "user contact is empty" });
     } else {
+        let i;
         for(i = 0; i < user.contact.length; i++){      
-            let incomingUser = await db.findOne("Users", {email: user.contact[i].userEmail}, { projection: { "email": 1, "profile": 1, "_id": 0 } });
+            let incomingUser = await db.findOne("Users", {email: user.contact[i].userEmail}, { projection: { "email": 1, "profile": 1 } });
             // console.log("incominguser: ", incomingUser);
             console.log(incomingUser.profile.avatarlink);
             console.log("user contact: ",user.contact[i]);
