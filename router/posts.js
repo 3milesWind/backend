@@ -89,7 +89,7 @@ router.post("/updateTheCommentList", async (req, res) => {
 
 router.get("/fetchTheCommentList", async ({ query: { postId } }, res) => {
     let post = await db.findOne("Posts", { "postId": postId }, { projection: { "commentList": 1 } });
-
+    let listlength = post.commentList ? post.commentList.length : 0;
     for (let i = 0; i < post.commentList.length; i++) {
         let user = await db.findOne("Users", { email: post.commentList[i].email }, { projection: { "userName": 1 } });
         post.commentList[i].userName = user.userName;
@@ -102,10 +102,7 @@ router.get("/fetchTheCommentList", async ({ query: { postId } }, res) => {
     }
 });
 
-router.delete("/deleteTheComment", async (req, res) => {
-    let postId = req.body.postId;
-    let commentId = req.body.commentId;
-
+router.delete("/deleteTheComment", async ( { query: { postId, commentId } }, res) => {
     let result = await db.updateOne("Posts", { postId: postId }, { $pull: { commentList: { commentId: commentId } } });
     if (result.matchedCount == 0) {
         res.status(404).json({ statusCode: 404, message: "current comment does not exist" });
