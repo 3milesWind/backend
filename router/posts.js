@@ -90,7 +90,7 @@ router.post("/updateTheCommentList", async (req, res) => {
 router.get("/fetchTheCommentList", async ({ query: { postId } }, res) => {
     let post = await db.findOne("Posts", { "postId": postId }, { projection: { "commentList": 1 } });
     let listlength = post.commentList ? post.commentList.length : 0;
-    for (let i = 0; i < post.commentList.length; i++) {
+    for (let i = 0; i < listlength; i++) {
         let user = await db.findOne("Users", { email: post.commentList[i].email }, { projection: { "userName": 1 } });
         post.commentList[i].userName = user.userName;
     }
