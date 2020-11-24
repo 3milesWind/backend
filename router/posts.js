@@ -1,5 +1,6 @@
 const db = require("../utils/database");
 const router = require("express").Router();
+const crypto = require("crypto");
 
 router.use(require("body-parser").json());
 
@@ -64,17 +65,17 @@ router.delete("/delete_a_post", async ({ query: { postId } }, res) => {
 
 router.post("/updateTheCommentList", async (req, res) => {
     let user = await db.findOne("Users", { email: req.body.email }, { projection: { "userName": 1 } });
-
     if (!user) {
-        res.status(404).json({ statusCode: 404, message: "user does not exist" });
+        res.status(404).json("user does not exist");
         return;
     }
 
     let data = {
-        userName: user.userName,
+        email: req.body.email,
         commentText: req.body.commentText,
         time: req.body.time,
-        date: req.body.date
+        date: req.body.date,
+        commentId: crypto.randomBytes(16).toString('hex')
     };
 
     let result = await db.updateOne("Posts", { postId: req.body.postId }, { $push: { commentList: data } });
@@ -89,10 +90,27 @@ router.post("/updateTheCommentList", async (req, res) => {
 router.get("/fetchTheCommentList", async ({ query: { postId } }, res) => {
     let post = await db.findOne("Posts", { "postId": postId }, { projection: { "commentList": 1 } });
 
+    for (let i = 0; i < post.commentList.length; i++) {
+        let user = await db.findOne("Users", { email: post.commentList[i].email }, { projection: { "userName": 1 } });
+        post.commentList[i].userName = user.userName;
+    }
+
     if (!post) {
         res.status(404).json({ statusCode: 404, message: "current post does not exist" });
     } else {
         res.status(200).json({ statusCode: 200, message: "success", commentList: post.commentList });
+    }
+});
+
+router.delete("/deleteTheComment", async (req, res) => {
+    let postId = req.body.postId;
+    let commentId = req.body.commentId;
+
+    let result = await db.updateOne("Posts", { postId: postId }, { $pull: { commentList: { commentId: commentId } } });
+    if (result.matchedCount == 0) {
+        res.status(404).json({ statusCode: 404, message: "current comment does not exist" });
+    } else {
+        res.status(200).json({ statusCode: 200, message: "success" });
     }
 });
 
