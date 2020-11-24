@@ -196,15 +196,23 @@ router.post("/profile/save", async (req, res) => {
     }
 });
 
-router.get("/profile/get", async ({ query: { email } }, res) => {
+router.get("/profile/get", async ({ query: { email, userEmail } }, res) => {
     let user = await db.findOne("Users", { email: email.toLowerCase() }, { projection: { "email": 1, "profile": 1, "userName": 1 } });
+
+    let isInContacts = false;
+
+    if (userEmail) {
+        let find = await db.findOne("Users", { email: userEmail, contact: { $elemMatch: { userEmail: email.toLowerCase() } } }, { projection: { contact: 1 } });
+        isInContacts = find ? true : false;
+    }
+
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else if (!user.profile) {
-        res.status(500).json({ statusCode: 500, message: "user profile is empty" });
+        res.status(500).json({ statusCode: 500, message: "user profile is empty", isInContacts: isInContacts });
     } else {
         user.profile.userName = user.userName;
-        res.status(200).json({ statusCode: 200, profile: user.profile });
+        res.status(200).json({ statusCode: 200, profile: user.profile, isInContacts: isInContacts });
     }
 });
 

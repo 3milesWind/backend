@@ -27,14 +27,6 @@ router.post("/create_a_post", async (req, res) => {
         data.avatarlink = user.profile.avatarlink;
     }
 
-    let user = await db.findOne("Users", { email: data.creatorEmail }, { projection: { "profile": 1 } });
-    
-    if (!user) {
-        res.status(404).json({ statusCode: 404, successful: false, message: "user not found" });
-    } else {
-        data.avatarlink = user.profile.avatarlink;
-    }
-
     db.insertOne("Posts", data);
     res.status(200).json({ statusCode: 200, successful: true, message: "Post Created" });
 });
