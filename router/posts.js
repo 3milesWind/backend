@@ -32,6 +32,16 @@ router.post("/create_a_post", async (req, res) => {
     res.status(200).json({ statusCode: 200, successful: true, message: "Post Created" });
 });
 
+router.post("/update_a_post", async (req, res) => {
+    let data = req.body;
+    let result = await db.updateOne("Posts", { postId: data.postId }, { $set: { title: data.title, description: data.description, postType: data.postType } });
+    if (result.matchedCount == 0) {
+        res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
+    } else {
+        res.status(200).json({ statusCode: 200, message: "success" });
+    }
+});
+
 /* Get All Posts */
 router.get("/get_all_posts", async (req, res) => { 
     // console.log("Get All Posts Function");
