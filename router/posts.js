@@ -32,6 +32,16 @@ router.post("/create_a_post", async (req, res) => {
     res.status(200).json({ statusCode: 200, successful: true, message: "Post Created" });
 });
 
+router.post("/update_a_post", async (req, res) => {
+    let data = req.body;
+    let result = await db.updateOne("Posts", { postId: data.postId }, { $set: { title: data.title, description: data.description, postType: data.postType } });
+    if (result.matchedCount == 0) {
+        res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
+    } else {
+        res.status(200).json({ statusCode: 200, message: "success" });
+    }
+});
+
 /* Get All Posts */
 router.get("/get_all_posts", async (req, res) => { 
     // console.log("Get All Posts Function");
@@ -104,6 +114,17 @@ router.get("/fetchTheCommentList", async ({ query: { postId } }, res) => {
 
 router.delete("/deleteTheComment", async ( { query: { postId, commentId } }, res) => {
     let result = await db.updateOne("Posts", { postId: postId }, { $pull: { commentList: { commentId: commentId } } });
+    if (result.matchedCount == 0) {
+        res.status(404).json({ statusCode: 404, message: "current comment does not exist" });
+    } else {
+        res.status(200).json({ statusCode: 200, message: "success" });
+    }
+});
+
+router.post("/updateTheComment", async (req, res) => {
+    let data = req.body;
+    let result = await db.updateOne("Posts", { "postId": data.postId, "commentList.commentId": data.commentId }, { $set: { "commentList.$.commentText": data.commentText } });
+    
     if (result.matchedCount == 0) {
         res.status(404).json({ statusCode: 404, message: "current comment does not exist" });
     } else {
