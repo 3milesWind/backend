@@ -121,4 +121,15 @@ router.delete("/deleteTheComment", async ( { query: { postId, commentId } }, res
     }
 });
 
+router.post("/updateTheComment", async (req, res) => {
+    let data = req.body;
+    let result = await db.updateOne("Posts", { "postId": data.postId, "commentList.commentId": data.commentId }, { $set: { "commentList.$.commentText": data.commentText } });
+    
+    if (result.matchedCount == 0) {
+        res.status(404).json({ statusCode: 404, message: "current comment does not exist" });
+    } else {
+        res.status(200).json({ statusCode: 200, message: "success" });
+    }
+})
+
 module.exports = router;
