@@ -99,15 +99,14 @@ router.post("/updateTheCommentList", async (req, res) => {
 
 router.get("/fetchTheCommentList", async ({ query: { postId } }, res) => {
     let post = await db.findOne("Posts", { "postId": postId }, { projection: { "commentList": 1 } });
-    let listlength = post.commentList ? post.commentList.length : 0;
-    for (let i = 0; i < listlength; i++) {
-        let user = await db.findOne("Users", { email: post.commentList[i].email }, { projection: { "userName": 1 } });
-        post.commentList[i].userName = user.userName;
-    }
-
     if (!post) {
         res.status(404).json({ statusCode: 404, message: "current post does not exist" });
     } else {
+        let listlength = post.commentList ? post.commentList.length : 0;
+        for (let i = 0; i < listlength; i++) {
+            let user = await db.findOne("Users", { email: post.commentList[i].email }, { projection: { "userName": 1 } });
+            post.commentList[i].userName = user.userName;
+        }
         res.status(200).json({ statusCode: 200, message: "success", commentList: post.commentList });
     }
 });
@@ -129,6 +128,32 @@ router.post("/updateTheComment", async (req, res) => {
         res.status(404).json({ statusCode: 404, message: "current comment does not exist" });
     } else {
         res.status(200).json({ statusCode: 200, message: "success" });
+    }
+});
+
+router.post("/like/like", async (req, res) => {
+    let email = req.body.email;
+    let postId = req.body.postId;
+
+    let result = await db.updateOne("Posts", { "postId": postId }, { $addToSet: { likeList: email } });
+    console.log(result);
+
+     if (result.modifiedCount == 0) {
+        res.status(404).json({ statusCode: 500, message: "like already exist!" });
+     } else {
+         let result2 = await db.updateOne("Posts", { "postId": postId }, { $inc: { likeNumber: 1 } });
+        res.status(200).json({ statusCode: 200, message: "success" });
+    }
+});
+
+router.get("/like/number", async ({ query: { postId } }, res) => {
+    let result = await db.findOne("Posts", { "postId": postId }, { projection: { likeNumber: 1 } });
+    
+    if (!result) {
+        res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
+    } else {
+        let likeNumber = result.likeNumber ? result.likeNumber : 0;
+        res.status(200).json({ statusCode: 200, likeNumber: likeNumber });
     }
 });
 
