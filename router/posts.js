@@ -136,25 +136,35 @@ router.post("/like/like", async (req, res) => {
     let postId = req.body.postId;
 
     let result = await db.updateOne("Posts", { "postId": postId }, { $addToSet: { likeList: email } });
-    console.log(result);
 
      if (result.modifiedCount == 0) {
-        res.status(404).json({ statusCode: 500, message: "like already exist!" });
+        res.status(500).json({ statusCode: 500, message: "like already exist!" });
      } else {
-         let result2 = await db.updateOne("Posts", { "postId": postId }, { $inc: { likeNumber: 1 } });
+         let result2 = await db.updateOne("Posts", { "postId": postId }, { $inc: { likes: 1 } });
         res.status(200).json({ statusCode: 200, message: "success" });
     }
 });
 
 router.get("/like/number", async ({ query: { postId } }, res) => {
-    let result = await db.findOne("Posts", { "postId": postId }, { projection: { likeNumber: 1 } });
+    let result = await db.findOne("Posts", { "postId": postId }, { projection: { likes: 1 } });
     
     if (!result) {
         res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
     } else {
-        let likeNumber = result.likeNumber ? result.likeNumber : 0;
+        let likeNumber = result.likes ? result.likes : 0;
         res.status(200).json({ statusCode: 200, likeNumber: likeNumber });
     }
 });
+
+router.get("/like/check", async ({ query: { postId, email } }, res) => {
+    let result = await db.findOne("Posts", { "postId": postId, likeList: { $elemMatch: { $eq: email } } }, { projection: { likes: 1 } });
+    
+    if (result) {
+        res.status(200).json({ statusCode: 200, exist: true });
+    } else {
+        res.status(200).json({ statusCode: 200, exist: false });
+    }
+});
+
 
 module.exports = router;
