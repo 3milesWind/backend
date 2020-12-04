@@ -72,7 +72,7 @@ module.exports = {
 
     deleteOne: async function(collection, querySelector) {
         try {
-            return await db.collection(collection).remove(querySelector, { justOne: true });
+            return await db.collection(collection).deleteOne(querySelector);
         } catch {
             throw Error(e);
         }
