@@ -27,7 +27,6 @@ router.post("/create_a_post", async (req, res) => {
     if (!user) {
         res.status(404).json({ statusCode: 404, successful: false, message: "user not found" });
     } else {
-        console.log(user);
         let avatarlink = user.profile ? user.profile.avatarlink : null;
         data.avatarlink = avatarlink;
     }
@@ -56,7 +55,6 @@ router.get("/get_all_posts", async (req, res) => {
 /* Get a post detail */
 router.get("/get_a_post_detail", async ({ query: { postId } }, res) => {
     let thePost = await postModel.getSinglePost(postId);
-    // console.log("a post detail: ", thePost);
     if (!thePost) {
         res.status(404).json({ statusCode: 404, message: "Post Does Not Exist!" });
     } else {

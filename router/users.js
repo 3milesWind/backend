@@ -257,7 +257,6 @@ router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
     if (!user) {
         res.status(404).json({ statusCode: 404, message: "user does not exist" });
     } else if (!user.contact) {
-        console.log("user's contactList empty");
         res.status(500).json({ statusCode: 500, message: "user contact is empty" });
     } else {
         let listlength = user.contact ? user.contact.length : 0;
