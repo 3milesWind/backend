@@ -6,17 +6,27 @@ const DATABASE_NAME = "EZCampus";
 let db;
 
 async function connect() {
-    let connection = await MongoClient.connect(DATABASE_URL,  {useUnifiedTopology: true});
+    let connection = await MongoClient.connect(DATABASE_URL, { useUnifiedTopology: true });
     db = connection.db(DATABASE_NAME);
+}
+
+async function setnewDate() {
+    db.collection("Posts").find({}, {}).forEach(async (doc) => {
+        let dateObj = new Date(doc.date);
+        console.log(dateObj);
+	await db.collection("Posts").updateOne({"postId": doc.postId}, {$set: {"dateObj": dateObj}});
+    });
+    return;
 }
 
 connect();
 
 module.exports = {
 
-    find: async function (collection, querySelector, queryOptions) {
+    find: async function (collection, querySelector, queryOptions, sortOptions) {
         try {
-            return await db.collection(collection).find(querySelector, queryOptions).toArray();
+//	    await setnewDate();
+            return await db.collection(collection).find(querySelector, queryOptions).sort(sortOptions).toArray();
         } catch (e) {
             throw Error(e);
         }
@@ -70,7 +80,7 @@ module.exports = {
         }
     },
 
-    deleteOne: async function(collection, querySelector) {
+    deleteOne: async function (collection, querySelector) {
         try {
             return await db.collection(collection).deleteOne(querySelector);
         } catch {

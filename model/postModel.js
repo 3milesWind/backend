@@ -15,7 +15,7 @@ module.exports = {
     },
 
     getAllPosts: async function () {
-        return await db.find('Posts', {}, { projection: { _id: 0 } });
+        return await db.find('Posts', {}, { projection: { _id: 0 } }, { "dateObj": -1 });
     },
 
     checkLikeUser: async function (postId, email) {
@@ -31,9 +31,9 @@ module.exports = {
                     description: data.description,
                     postType: data.postType
                 }
-        });
+            });
     },
-    
+
     updatePostUserData: async function (email, data) {
         return await db.updateMany("Posts", { creatorEmail: email }, { $set: data });
     },
