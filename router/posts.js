@@ -21,9 +21,8 @@ router.post("/create_a_post", async (req, res) => {
         creatorEmail: req.body.creatorEmail,
         postType: req.body.postType
     };
-
-    data.description = data.description.replace(
-        '<p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>', '');
+    
+    data.dateObj = new Date(data.date);
 
     let user = await userModel.getUser(data.creatorEmail);
     
@@ -53,7 +52,6 @@ router.post("/update_a_post", async (req, res) => {
 /* Get All Posts */
 router.get("/get_all_posts", async (req, res) => { 
     let allPosts = await postModel.getAllPosts();
-    allPosts.reverse();
     res.status(200).json({"statusCode": 200, "data": allPosts});
 });
 
