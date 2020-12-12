@@ -264,7 +264,9 @@ router.get("/contact/get_contactList", async ({ query: { email } }, res) => {
         for (i = 0; i < listlength; i++){ 
             let incomingUser = await userModel.getUser(user.contact[i].userEmail);
             let incomingAvatarlink = incomingUser.profile ? incomingUser.profile.avatarlink : null;
-            user.contact[i].avatarlink = incomingAvatarlink;
+            let incomingUsername = incomingUser.userName? incomingUser.userName : null;
+	    user.contact[i].avatarlink = incomingAvatarlink;
+	    user.contact[i].userName = incomingUsername;
         }
         res.status(200).json({ statusCode: 200, contact: user.contact });
     }    
